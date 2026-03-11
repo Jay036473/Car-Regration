@@ -81,7 +81,7 @@ st.markdown('<p class="subtitle">Machine Learning Model using Random Forest</p>'
 # =========================
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r"D:\PythonProject\csv\CRAS.csv")
+    df = pd.read_csv("CRAS.csv")
     df["brand"] = df["name"].apply(lambda x: x.split()[0])
     df["car_age"] = 2026 - df["year"]
     df = df.drop(["name", "year"], axis=1)
@@ -203,4 +203,5 @@ with chart_col2:
     # Chart 6: KM Driven vs Price (Added height=550)
     fig6 = px.scatter(df, x="km_driven", y="selling_price", title="6. KM Driven vs. Selling Price",
                       template="plotly_dark", color="fuel", opacity=0.6, height=550)
+
     st.plotly_chart(fig6, use_container_width=True)
