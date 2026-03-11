@@ -1,5 +1,5 @@
-pandas
-numpy
 streamlit
-plotly
+pandas
+seaborn
 scikit-learn
+scipy
