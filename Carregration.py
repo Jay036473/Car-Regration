@@ -9,7 +9,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.pipeline import Pipeline
 
 # =========================
-# PAGE CONFIG (Changed to "wide" for bigger charts)
+# PAGE CONFIG
 # =========================
 st.set_page_config(page_title="Car Price Predictor", page_icon="🚗", layout="wide")
 
@@ -73,7 +73,7 @@ label {
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">Car Price Prediction</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">🚗 Car Price Prediction</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Machine Learning Model using Random Forest</p>', unsafe_allow_html=True)
 
 # =========================
@@ -81,14 +81,14 @@ st.markdown('<p class="subtitle">Machine Learning Model using Random Forest</p>'
 # =========================
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r"CRAS.csv")
+    df = pd.read_csv(r"D:\PythonProject\csv\CRAS.csv")
     df["brand"] = df["name"].apply(lambda x: x.split()[0])
     df["car_age"] = 2026 - df["year"]
     df = df.drop(["name", "year"], axis=1)
     return df
 
 # =========================
-# TRAIN MODEL
+# TRAIN MODEL (UPDATED TO RETURN SCORE)
 # =========================
 @st.cache_resource
 def train_model(df):
@@ -109,15 +109,25 @@ def train_model(df):
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=36)
     model.fit(X_train, y_train)
-    return model
+    
+    # Calculate R-squared score on testing data
+    model_score = model.score(X_test, y_test)
+    
+    return model, model_score
 
 df = load_data()
-model = train_model(df)
+# Unpack the model AND the score
+model, r2_score = train_model(df)
+
+# =========================
+# DISPLAY MODEL SCORE (NEW)
+# =========================
+st.markdown(f'<p style="text-align:center; font-size:20px; color:#00ff9d;"><strong>🎯 Model R² Score: {r2_score:.2%}</strong></p>', unsafe_allow_html=True)
 
 # =========================
 # DATA PREVIEW
 # =========================
-with st.expander("Preview Dataset"):
+with st.expander("🔍 Preview Dataset"):
     st.dataframe(df.head(50), use_container_width=True)
     st.write("Total Rows:", df.shape[0])
 
@@ -163,10 +173,10 @@ if st.button("Predict Car Price"):
     )
 
 # =========================
-# NEW SECTION: 6 DATA CHARTS
+# 6 DATA CHARTS
 # =========================
 st.write("---")
-st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;"> Market Insights</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;">📊 Market Insights</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Explore the dataset through visualizations</p>', unsafe_allow_html=True)
 
 # Using columns to put charts side-by-side
@@ -203,6 +213,4 @@ with chart_col2:
     # Chart 6: KM Driven vs Price (Added height=550)
     fig6 = px.scatter(df, x="km_driven", y="selling_price", title="6. KM Driven vs. Selling Price",
                       template="plotly_dark", color="fuel", opacity=0.6, height=550)
-
     st.plotly_chart(fig6, use_container_width=True)
-
