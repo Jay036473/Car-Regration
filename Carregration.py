@@ -73,7 +73,7 @@ label {
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">🚗 Car Price Prediction</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">Car Price Prediction</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Machine Learning Model using Random Forest</p>', unsafe_allow_html=True)
 
 # =========================
@@ -117,7 +117,7 @@ model = train_model(df)
 # =========================
 # DATA PREVIEW
 # =========================
-with st.expander("🔍 Preview Dataset"):
+with st.expander("Preview Dataset"):
     st.dataframe(df.head(50), use_container_width=True)
     st.write("Total Rows:", df.shape[0])
 
@@ -166,7 +166,7 @@ if st.button("Predict Car Price"):
 # NEW SECTION: 6 DATA CHARTS
 # =========================
 st.write("---")
-st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;">📊 Market Insights</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;"> Market Insights</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Explore the dataset through visualizations</p>', unsafe_allow_html=True)
 
 # Using columns to put charts side-by-side
@@ -205,3 +205,4 @@ with chart_col2:
                       template="plotly_dark", color="fuel", opacity=0.6, height=550)
 
     st.plotly_chart(fig6, use_container_width=True)
+
