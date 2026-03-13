@@ -5,7 +5,7 @@ import plotly.express as px
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
 # =========================
@@ -66,6 +66,16 @@ st.markdown("""
     border: 1px solid #00ff9d;
 }
 
+.score-box{
+    text-align:center;
+    font-size:20px;
+    color:#ffffff;
+    background-color: rgba(255, 75, 75, 0.8);
+    padding:10px;
+    border-radius:8px;
+    margin-bottom: 20px;
+}
+
 label {
     color: white !important;
     font-weight: 600;
@@ -74,7 +84,8 @@ label {
 """, unsafe_allow_html=True)
 
 st.markdown('<p class="main-title">🚗 Car Price Prediction</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Machine Learning Model using Random Forest</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Machine Learning Model using Linear Regression</p>', unsafe_allow_html=True)
+
 
 # =========================
 # LOAD DATA
@@ -87,8 +98,9 @@ def load_data():
     df = df.drop(["name", "year"], axis=1)
     return df
 
+
 # =========================
-# TRAIN MODEL (UPDATED TO RETURN SCORE)
+# TRAIN MODEL & GET SCORE
 # =========================
 @st.cache_resource
 def train_model(df):
@@ -104,25 +116,27 @@ def train_model(df):
 
     model = Pipeline([
         ("preprocessor", preprocessor),
-        ("regressor", RandomForestRegressor(n_estimators=300, max_depth=15, min_samples_split=5, min_samples_leaf=2, random_state=42))
+        ("regressor", LinearRegression())
     ])
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=36)
     model.fit(X_train, y_train)
-    
-    # Calculate R-squared score on testing data
-    model_score = model.score(X_test, y_test)
-    
-    return model, model_score
+
+    # Calculate the R-squared score on the test data
+    score = model.score(X_test, y_test)
+
+    return model, score
+
 
 df = load_data()
-# Unpack the model AND the score
-model, r2_score = train_model(df)
+model, model_score = train_model(df)  # <-- Unpacking both the model and the score here
 
 # =========================
-# DISPLAY MODEL SCORE (NEW)
+# DISPLAY MODEL SCORE
 # =========================
-st.markdown(f'<p style="text-align:center; font-size:20px; color:#00ff9d;"><strong>🎯 Model R² Score: {r2_score:.2%}</strong></p>', unsafe_allow_html=True)
+# Shows the accuracy/score prominently
+st.markdown(f'<div class="score-box">🎯 Model Accuracy (R² Score): {model_score * 100:.2f}%</div>',
+            unsafe_allow_html=True)
 
 # =========================
 # DATA PREVIEW
@@ -176,42 +190,36 @@ if st.button("Predict Car Price"):
 # 6 DATA CHARTS
 # =========================
 st.write("---")
-st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;">📊 Market Insights</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title" style="font-size:32px; color:#00ff9d;">📊 Market Insights</p>',
+            unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Explore the dataset through visualizations</p>', unsafe_allow_html=True)
 
-# Using columns to put charts side-by-side
 chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
-    # Chart 1: Price Distribution (Added height=550)
     fig1 = px.histogram(df, x="selling_price", nbins=40, title="1. Distribution of Selling Prices",
                         template="plotly_dark", color_discrete_sequence=['#ff4b4b'], height=550)
     st.plotly_chart(fig1, use_container_width=True)
 
-    # Chart 3: Fuel Type vs Price (Added height=550)
     fig3 = px.box(df, x="fuel", y="selling_price", title="3. Price by Fuel Type",
                   template="plotly_dark", color="fuel", height=550)
     st.plotly_chart(fig3, use_container_width=True)
 
-    # Chart 5: Top 10 Brands by Average Price (Added height=550)
-    top_brands = df.groupby('brand')['selling_price'].mean().reset_index().sort_values(by='selling_price', ascending=False).head(10)
+    top_brands = df.groupby('brand')['selling_price'].mean().reset_index().sort_values(by='selling_price',
+                                                                                       ascending=False).head(10)
     fig5 = px.bar(top_brands, x='brand', y='selling_price', title="5. Top 10 Most Expensive Brands (Avg)",
                   template="plotly_dark", color='brand', height=550)
     st.plotly_chart(fig5, use_container_width=True)
 
 with chart_col2:
-    # Chart 2: Car Age vs Price (Added height=550)
     fig2 = px.scatter(df, x="car_age", y="selling_price", title="2. Car Age vs. Selling Price",
                       template="plotly_dark", color="transmission", opacity=0.7, height=550)
     st.plotly_chart(fig2, use_container_width=True)
 
-    # Chart 4: Transmission Distribution (Added height=550)
     fig4 = px.pie(df, names="transmission", title="4. Market Share by Transmission",
                   template="plotly_dark", hole=0.4, color_discrete_sequence=px.colors.sequential.RdBu, height=550)
     st.plotly_chart(fig4, use_container_width=True)
 
-    # Chart 6: KM Driven vs Price (Added height=550)
     fig6 = px.scatter(df, x="km_driven", y="selling_price", title="6. KM Driven vs. Selling Price",
                       template="plotly_dark", color="fuel", opacity=0.6, height=550)
     st.plotly_chart(fig6, use_container_width=True)
-
