@@ -129,14 +129,8 @@ def train_model(df):
 
 
 df = load_data()
-model, model_score = train_model(df)  # <-- Unpacking both the model and the score here
+model, model_score = train_model(df)
 
-# =========================
-# DISPLAY MODEL SCORE
-# =========================
-# Shows the accuracy/score prominently
-st.markdown(f'<div class="score-box">🎯 Model Accuracy (R² Score): {model_score * 100:.2f}%</div>',
-            unsafe_allow_html=True)
 
 # =========================
 # DATA PREVIEW
@@ -167,7 +161,7 @@ with col2:
 brand = st.selectbox("Car Brand", sorted(df["brand"].unique()))
 
 # =========================
-# PREDICTION
+# PREDICTION (Score moved here!)
 # =========================
 if st.button("Predict Car Price"):
     car_age = 2026 - year
@@ -181,6 +175,11 @@ if st.button("Predict Car Price"):
     eur_rate = 90
     price_euro = price_inr / eur_rate
 
+    # Display the score first
+    st.markdown(f'<div class="score-box">🎯 Model Accuracy (R² Score): {model_score * 100:.2f}%</div>',
+                unsafe_allow_html=True)
+
+    # Then display the estimated car price
     st.markdown(
         f'<div class="result-box">Estimated Car Price: € {price_euro:,.2f}</div>',
         unsafe_allow_html=True
